@@ -1,0 +1,13 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.buildDirectory": "${workspaceFolder}/build/${buildType}",
+    "files.encoding": "utf8",
+    "cmake.generator": "Visual Studio 17 2022",
+    "terminal.integrated.env.windows": {
+        "CHCP": "65001"
+    },
+    "files.associations": {
+        "string": "cpp"
+    }
+}
