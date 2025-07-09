@@ -10,7 +10,7 @@
         "/I", "C:\\Users\\SQI\\Downloads\\microsoft.web.webview2.1.0.3240.44\\build\\native\\include",
         "/I", "include",
         "/I", "lib",
-        "/Fe:build\\genius.exe",  // 출력 실행 파일 이름
+        "/Fe:build\\ktGeniusExam_v250709.exe",  // 출력 실행 파일 이름
         "/link",
         "/LIBPATH:C:\\Users\\SQI\\Downloads\\microsoft.web.webview2.1.0.3240.44\\build\\native\\x64",
         "WebView2LoaderStatic.lib",

@@ -5,7 +5,7 @@
       "name": "Debug genius",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/genius.exe",
+      "program": "${workspaceFolder}/build/ktGeniusExam_v250709.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

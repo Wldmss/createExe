@@ -2,6 +2,8 @@
 cmake -B build/Release -G "Visual Studio 17 2022"
 cmake --build build/Release --config Release
 
+-> D:\git\createExe\build\Release\build\Release\ 여기에 생성됨
+
 <!-- cmake -DCMAKE_BUILD_TYPE=Release -B build/release
 cmake --build build/release -->
 

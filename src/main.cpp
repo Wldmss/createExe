@@ -99,7 +99,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
     SetForegroundWindow(hwnd);
     SetFocus(hwnd);
 
-    bool isTest = false;    // 테스트 시 true
+    bool isTest = true;    // 테스트 시 true
 
     if (!IsDualMonitorConnected(true) || isTest)
     {
