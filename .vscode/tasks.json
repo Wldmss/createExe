@@ -7,12 +7,10 @@
       "command": "cl.exe",
       "args": [
         "src\\*.cpp",  // 소스 파일 경로 (필요 시 수정)
-        "/I", "C:\\Users\\SQI\\Downloads\\microsoft.web.webview2.1.0.3240.44\\build\\native\\include",
         "/I", "include",
         "/I", "lib",
         "/Fe:build\\ktGeniusExam_v250709.exe",  // 출력 실행 파일 이름
         "/link",
-        "/LIBPATH:C:\\Users\\SQI\\Downloads\\microsoft.web.webview2.1.0.3240.44\\build\\native\\x64",
         "WebView2LoaderStatic.lib",
         "user32.lib",
         "ole32.lib",

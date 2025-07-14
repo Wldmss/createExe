@@ -4,6 +4,7 @@
     "cmake.buildDirectory": "${workspaceFolder}/build/${buildType}",
     "files.encoding": "utf8",
     "cmake.generator": "Visual Studio 17 2022",
+    "cmake.configureArgs": ["-A", "x64"],
     "terminal.integrated.env.windows": {
         "CHCP": "65001"
     },
