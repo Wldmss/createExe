@@ -36,3 +36,16 @@ cmake -B build/Debug -G "Visual Studio 17 2022" -A x64
 cmake --build build/Debug --config Debug
 
 -> 파일 생성 경로: \build\Debug\build\Debug\
+
+# 주의사항
+파일이 utf-8 이어야 정상적으로 실행됨.
+가끔 신경을 안쓰면 utf-8 로 변경하다가 한글이 모두 깨질수도 있으니 주의 바람
+
+# 기능
+- 특수 키 차단 (keypress.cpp)
+    - ctrl, alt, f11, f12, windows
+- 듀얼 모니터, 다른 창 감지 (monitor.cpp)
+    - 듀얼 모니터 감지 시 앱 실행 불가
+    - 1초에 한번씩 다른 창 감지
+- webview로 화면 노출 (view.cpp)
+- webview에서 평가 종료 화면 표기 시 앱 종료 처리 (view.cpp > InjectedJavascript)

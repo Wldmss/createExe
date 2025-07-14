@@ -5,21 +5,21 @@
 #include <stdio.h>
 
 HHOOK g_hHook = NULL;
-extern bool g_isExit;
+extern bool g_isPass;
 
 void ShowWarningMessage()
 {
-    // ±âÁ¸ °æ°íÃ¢ ´İ±â
-    HWND oldMsgBox = FindWindow(NULL, L"°æ°í");
+    // ê¸°ì¡´ ê²½ê³ ì°½ ë‹«ê¸°
+    HWND oldMsgBox = FindWindow(NULL, L"ê²½ê³ ");
     if (oldMsgBox) {
         PostMessage(oldMsgBox, WM_CLOSE, 0, 0);
         Sleep(100);
     }
 
-    if(!g_isExit)
+    if(!g_isPass)
         MessageBoxW(NULL,
-            L"Æò°¡ Áß alt, ctrl Å°¿Í °°Àº Æ¯¼öÅ°¸¦ »ç¿ëÇÏ½Ç ¼ö ¾ø½À´Ï´Ù.\n¹İº¹ÀûÀ¸·Î »ç¿ëÇÏ½Ç °æ¿ì Æò°¡¿¡ ºÒÀÌÀÍÀÌ ÀÖÀ» ¼ö ÀÖ½À´Ï´Ù.",
-            L"°æ°í",
+            L"í‰ê°€ ì¤‘ alt, ctrl í‚¤ì™€ ê°™ì€ íŠ¹ìˆ˜í‚¤ë¥¼ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\në°˜ë³µì ìœ¼ë¡œ ì‚¬ìš©í•˜ì‹¤ ê²½ìš° í‰ê°€ì— ë¶ˆì´ìµì´ ìˆì„ ìˆ˜ ìˆìŠµë‹ˆë‹¤.",
+            L"ê²½ê³ ",
             MB_OK | MB_ICONWARNING | MB_TOPMOST);
 }
 
@@ -64,10 +64,10 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
             }
         }
 
-        if (isKeyBlocked)
+        if (isKeyBlocked && !g_isPass)
         {
             CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ShowWarningMessage, NULL, 0, NULL);
-            return 1; // Å° ÀÔ·Â ¹«½Ã
+            return 1; // í‚¤ ì…ë ¥ ë¬´ì‹œ
         }
     }
 

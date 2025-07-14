@@ -1,7 +1,7 @@
 // view.cpp
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "ole32.lib")
-#pragma comment(lib, "WebView2LoaderStatic.lib") // WebView2 Á¤Àû ¸µÅ© ½Ã
+#pragma comment(lib, "WebView2LoaderStatic.lib") // WebView2 ì •ì  ë§í¬ ì‹œ
 
 #include <windows.foundation.h>
 #include <wrl.h>
@@ -18,7 +18,7 @@
 
 using namespace Microsoft::WRL;
 
-// Àü¿ª º¯¼ö·Î WebView2 °´Ã¼µé À¯Áö (view.cpp ³» Àü¿ª)
+// ì „ì—­ ë³€ìˆ˜ë¡œ WebView2 ê°ì²´ë“¤ ìœ ì§€ (view.cpp ë‚´ ì „ì—­)
 static wil::com_ptr<ICoreWebView2Environment> g_webviewEnvironment;
 static wil::com_ptr<ICoreWebView2Controller> g_webviewController;
 static wil::com_ptr<ICoreWebView2> g_webviewWindow;
@@ -26,38 +26,158 @@ static wil::com_ptr<ICoreWebView2> g_webviewWindow;
 static HWND g_parentWindow = nullptr;
 const wchar_t WEB_URL[] = L"https://ktedu.kt.com";
 
-#define ID_EXIT_BUTTON 1001 // ¹öÆ° ID
+HWND g_headerWindow = nullptr;
+HWND g_exitButton = nullptr;
 
-// À©µµ¿ì Å©±â º¯°æ ½Ã WebView Å©±â ¸ÂÃß±â
+LRESULT CALLBACK HeaderWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+        case WM_COMMAND: {
+            int controlID = LOWORD(wParam);
+            if (controlID == ID_EXIT_BUTTON) {
+                // í‰ê°€ ì¢…ë£Œ ë²„íŠ¼ í´ë¦­
+                int result = MessageBox(g_mainWindow, L"ì‹œí—˜ì„ ì¢…ë£Œí•˜ì‹œê² ìŠµë‹ˆê¹Œ?", L"í™•ì¸", MB_OKCANCEL | MB_ICONQUESTION);
+                if (result == IDOK) {
+                    PostMessage(g_mainWindow, WM_DESTROY, 0, 0);
+                }
+            }
+            break;
+        }
+        case WM_ERASEBKGND:
+            // í—¤ë” ë°°ê²½ìƒ‰ ì‚­ì œ
+            return (LRESULT)GetStockObject(WHITE_BRUSH);
+        case WM_PAINT: {
+            // í—¤ë” ë°°ê²½ìƒ‰
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
+
+            RECT clientRect;
+            GetClientRect(hwnd, &clientRect);
+            HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
+            FillRect(hdc, &clientRect, hBrush);
+            DeleteObject(hBrush);
+
+            EndPaint(hwnd, &ps);
+            return 0;
+        }
+        case WM_SIZE: {
+            // í—¤ë” ìœˆë„ìš° í¬ê¸° ë³€ê²½ ì‹œ ë²„íŠ¼ ìœ„ì¹˜ ì¡°ì •
+            if (g_exitButton) {
+                RECT rcHeader;
+                GetClientRect(hwnd, &rcHeader);
+                MoveWindow(g_exitButton, rcHeader.right - 110, 10, 100, 30, TRUE);
+            }
+            break;
+        }
+        default:
+            return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+    return 0;
+}
+
+// í—¤ë”ì™€ ë²„íŠ¼ ìƒì„± (í—¤ë” ë°°ê²½ í°ìƒ‰, ë²„íŠ¼ ì˜¤ë¥¸ìª½)
+void CreateHeader(HWND parent, HINSTANCE hInst) {
+    RECT rc;
+    GetClientRect(parent, &rc);
+
+    g_headerWindow = CreateWindowEx(
+        WS_EX_NOACTIVATE, HEADER_CLASS_NAME, L"",
+        WS_CHILD | WS_VISIBLE | SS_NOTIFY,
+        0, 0, rc.right, HEADER_HEIGHT,
+        parent, (HMENU)ID_HEADER, hInst, nullptr);
+
+    g_exitButton = CreateWindow(
+        L"BUTTON", L"í‰ê°€ ì¢…ë£Œ",
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+        rc.right - 110, 10, 100, 30,
+        g_headerWindow, (HMENU)ID_EXIT_BUTTON, hInst, nullptr);
+}
+
+// í‰ê°€ ì¢…ë£Œ ë²„íŠ¼
+// HWND CreateExitButton(HWND hwnd, HINSTANCE hInst) {
+//     return CreateWindow(
+//         L"BUTTON", L"í‰ê°€ ì¢…ë£Œ",
+//         WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+//         0, 0, 100, 70,
+//         hwnd,
+//         (HMENU)ID_EXIT_BUTTON,
+//         hInst,
+//         nullptr
+//     );
+// }
+
+// ìœˆë„ìš° í¬ê¸° ë³€ê²½ ì‹œ WebView í¬ê¸° ë§ì¶”ê¸°
 void ResizeWebView()
 {
     if (g_webviewController && g_parentWindow)
     {
         RECT bounds;
         GetClientRect(g_parentWindow, &bounds);
+        bounds.top += HEADER_HEIGHT; // í—¤ë” ë†’ì´ë§Œí¼ ì•„ë˜ë¡œ ì´ë™
         g_webviewController->put_Bounds(bounds);
+
+        // í—¤ë”ì™€ ë²„íŠ¼ë„ ë¦¬ì‚¬ì´ì¦ˆ
+        if (g_headerWindow) {
+            MoveWindow(g_headerWindow, 0, 0, bounds.right, HEADER_HEIGHT, TRUE);
+        }
+        if (g_exitButton) {
+            MoveWindow(g_exitButton, bounds.right - 110, 10, 100, 30, TRUE);
+        }
     }
 }
 
-// Æò°¡ Á¾·á ¹öÆ°
-HWND CreateExitButton(HWND hwnd, HINSTANCE hInst) {
-    return CreateWindow(
-        L"BUTTON", L"Æò°¡ Á¾·á",
-        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-        0, 0, 100, 30,
-        hwnd,
-        (HMENU)ID_EXIT_BUTTON,
-        hInst,
-        nullptr
-    );
+// WebView javascript í•¸ë“¤ëŸ¬ ì„¤ì •
+void InjectedJavascript() {
+    // ë²„íŠ¼ í´ë¦­ ì´ë²¤íŠ¸
+    g_webviewWindow->AddScriptToExecuteOnDocumentCreated(
+        L"document.addEventListener('DOMContentLoaded', function() {"
+        L"  var btn = document.getElementById('loginMsg');"
+        L"  if(btn) {"
+        L"    btn.addEventListener('click', function() {"
+        L"      window.chrome.webview.postMessage('buttonClicked');"
+        L"    });"
+        L"  }"
+        L"});",
+        nullptr);
+
+    g_webviewWindow->add_WebMessageReceived(
+        Callback<ICoreWebView2WebMessageReceivedEventHandler>(
+            [](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args) -> HRESULT {
+                wil::unique_cotaskmem_string message;
+                args->get_WebMessageAsJson(&message);
+                std::wstring msg = message.get();
+                if (msg == L"\"buttonClicked\"") {
+                    MessageBox(nullptr, L"ì›¹ ë²„íŠ¼ì´ í´ë¦­ë˜ì—ˆìŠµë‹ˆë‹¤!", L"ì•Œë¦¼", MB_OK);
+                }
+                return S_OK;
+            }).Get(), nullptr);
+
+    // íŠ¹ì • URL ì ‘ì† ì´ë²¤íŠ¸
+    g_webviewWindow->add_NavigationCompleted(
+        Callback<ICoreWebView2NavigationCompletedEventHandler>(
+            [](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args) -> HRESULT {
+                wil::unique_cotaskmem_string uri;
+                sender->get_Source(&uri);
+                std::wstring targetUrl = L"myCourseList.do";
+                if (uri && std::wstring(uri.get()).find(targetUrl) != std::wstring::npos) {
+                    MessageBox(nullptr, L"íŠ¹ì • URLì— ì ‘ì†í–ˆìŠµë‹ˆë‹¤!", L"ì•Œë¦¼", MB_OK);
+                }
+                return S_OK;
+            }).Get(), nullptr);
+}
+
+// webview ìƒì„± ì´í›„ ì²˜ë¦¬
+void SetAfterWebviewCreated(HWND parent, HINSTANCE hInst) {
+    CreateHeader(parent, hInst);
+    ResizeWebView();
+    InjectedJavascript();
 }
 
 // webview load
-void LaunchWebView(HWND parentWindow)
+void LaunchWebView(HWND parent, HINSTANCE hInst)
 {
-    g_parentWindow = parentWindow;
+    g_parentWindow = parent;
 
-     // 1. ÀÓ½Ã Æú´õ °æ·Î °¡Á®¿À±â
+     // 1. ì„ì‹œ í´ë” ê²½ë¡œ ê°€ì ¸ì˜¤ê¸°
     PWSTR tempPath = nullptr;
     std::wstring userDataFolder;
 
@@ -68,21 +188,21 @@ void LaunchWebView(HWND parentWindow)
     }
     else
     {
-        MessageBox(parentWindow, L"ÀÓ½Ã Æú´õ¸¦ °¡Á®¿Ã ¼ö ¾ø½À´Ï´Ù.", L"¿À·ù", MB_OK | MB_ICONERROR);
+        MessageBox(parent, L"ì„ì‹œ í´ë”ë¥¼ ê°€ì ¸ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", L"ì˜¤ë¥˜", MB_OK | MB_ICONERROR);
         return;
     }
 
     HRESULT hr = CreateCoreWebView2EnvironmentWithOptions(
         nullptr,
-        userDataFolder.c_str(),  // ÀÓ½Ã °æ·Î·Î ¼³Á¤
+        userDataFolder.c_str(),  // ì„ì‹œ ê²½ë¡œë¡œ ì„¤ì •
         nullptr,
         Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
-            [](HRESULT result, ICoreWebView2Environment* env) -> HRESULT
+            [parent, hInst](HRESULT result, ICoreWebView2Environment* env) -> HRESULT
             {
                 if (FAILED(result))
                 {
-                    MessageBox(nullptr, L"¾ÛÀ» ´Ù½Ã ½ÇÇàÇØÁÖ¼¼¿ä.", L"¿À·ù", MB_OK | MB_ICONERROR);
-                    // MessageBox(nullptr, L"WebView2 È¯°æ »ı¼º ½ÇÆĞ", L"¿À·ù", MB_OK | MB_ICONERROR);
+                    MessageBox(nullptr, L"ì•±ì„ ë‹¤ì‹œ ì‹¤í–‰í•´ì£¼ì„¸ìš”.", L"ì˜¤ë¥˜", MB_OK | MB_ICONERROR);
+                    // MessageBox(nullptr, L"WebView2 í™˜ê²½ ìƒì„± ì‹¤íŒ¨", L"ì˜¤ë¥˜", MB_OK | MB_ICONERROR);
                     return result;
                 }
                 g_webviewEnvironment = env;
@@ -90,22 +210,21 @@ void LaunchWebView(HWND parentWindow)
                 g_webviewEnvironment->CreateCoreWebView2Controller(
                     g_parentWindow,
                     Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-                        [](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT
+                        [parent, hInst](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT
                         {
                             if (FAILED(result))
                             {
-                                MessageBox(nullptr, L"¾ÛÀ» ´Ù½Ã ½ÇÇàÇØÁÖ¼¼¿ä.", L"¿À·ù", MB_OK | MB_ICONERROR);
-                                // MessageBox(nullptr, L"WebView2 ÄÁÆ®·Ñ·¯ »ı¼º ½ÇÆĞ", L"¿À·ù", MB_OK | MB_ICONERROR);
+                                MessageBox(nullptr, L"ì•±ì„ ë‹¤ì‹œ ì‹¤í–‰í•´ì£¼ì„¸ìš”.", L"ì˜¤ë¥˜", MB_OK | MB_ICONERROR);
+                                // MessageBox(nullptr, L"WebView2 ì»¨íŠ¸ë¡¤ëŸ¬ ìƒì„± ì‹¤íŒ¨", L"ì˜¤ë¥˜", MB_OK | MB_ICONERROR);
                                 return result;
                             }
 
                             g_webviewController = controller;
                             g_webviewController->get_CoreWebView2(&g_webviewWindow);
-
-                            ResizeWebView();
-
                             g_webviewController->put_IsVisible(TRUE);
                             g_webviewWindow->Navigate(WEB_URL);
+
+                            SetAfterWebviewCreated(parent, hInst);
 
                             return S_OK;
                         }).Get());
@@ -115,6 +234,6 @@ void LaunchWebView(HWND parentWindow)
 
     if (FAILED(hr))
     {
-        MessageBox(parentWindow, L"¾ÛÀ» ´Ù½Ã ½ÇÇàÇØÁÖ¼¼¿ä.", L"¿À·ù", MB_OK | MB_ICONERROR);
+        MessageBox(parent, L"ì•±ì„ ë‹¤ì‹œ ì‹¤í–‰í•´ì£¼ì„¸ìš”.", L"ì˜¤ë¥˜", MB_OK | MB_ICONERROR);
     }
 }

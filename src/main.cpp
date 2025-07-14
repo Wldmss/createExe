@@ -5,56 +5,30 @@
 #include "monitor.h"
 #include "keypress.h"
 
-static HWND g_exitButton = nullptr;
+bool g_noAlert = true;   // ë‹¤ë¥¸ ì°½ ê²½ê³  í‘œì‹œ ì—¬ë¶€ (TEST ìš©)
+bool g_isPass = true;    // key hook, ë“€ì–¼ ëª¨ë‹ˆí„° ì²´í¬ pass (TEST ìš©)
+
 HWND g_mainWindow = nullptr;
-bool g_isExit = false;
+
+const wchar_t CLASS_NAME[] = L"MyWindowClass";
+const wchar_t HEADER_CLASS_NAME[] = L"CustomHeaderClass";
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
     case WM_DISPLAYCHANGE:
-        {
-            if (IsDualMonitorConnected(false))
-            {
-                // MessageBox(hwnd, L"µà¾ó ¸ğ´ÏÅÍ°¡ ¿¬°áµÇ¾ú½À´Ï´Ù.", L"¾Ë¸²", MB_OK | MB_ICONINFORMATION);
-                // ¿¹: DestroyWindow(hwnd);
-            }
-        }
+        IsDualMonitorConnected(false);
         return 0;
 
     case WM_ACTIVATEAPP:
         if (wParam == FALSE)
         {
-            // MessageBox(hwnd, L"´Ù¸¥ Ã¢ÀÌ °¨ÁöµÇ¾ú½À´Ï´Ù.", L"°æ°í", MB_OK | MB_ICONWARNING);
-            // ¶Ç´Â: DestroyWindow(hwnd);
+            // MessageBox(hwnd, L"ë‹¤ë¥¸ ì°½ì´ ê°ì§€ë˜ì—ˆìŠµë‹ˆë‹¤.", L"ê²½ê³ ", MB_OK | MB_ICONWARNING);
+            // ë˜ëŠ”: DestroyWindow(hwnd);
         }
         return 0;
 
-    case WM_COMMAND:
-        if (LOWORD(wParam) == ID_EXIT_BUTTON)
-        {
-            g_isExit = true;
-            int result = MessageBox(hwnd, L"½ÃÇèÀ» Á¾·áÇÏ½Ã°Ú½À´Ï±î?", L"È®ÀÎ", MB_OKCANCEL | MB_ICONQUESTION);
-            if (result == IDOK)
-            {
-                DestroyWindow(hwnd); // È®ÀÎ ½Ã Á¾·á
-            } else {
-                g_isExit = false;
-            }
-        }
-        return 0;
-
-    case WM_SIZE:
-        ResizeWebView(); // WebView Å©±â Á¶Á¤
-        if (g_exitButton)
-        {
-            int width = LOWORD(lParam);
-            int height = HIWORD(lParam);
-            MoveWindow(g_exitButton, width - 120, height - 50, 100, 30, TRUE);
-        }
-        return 0;
-    
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
@@ -71,18 +45,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
 {
     SetConsoleOutputCP(949); // EUC-KR (CP949)
-    const wchar_t CLASS_NAME[] = L"MyWindowClass";
 
+    // ë©”ì¸ ìœˆë„ìš° í´ë˜ìŠ¤
     WNDCLASS wc = { };
     wc.lpfnWndProc = WndProc;
     wc.hInstance = hInst;
     wc.lpszClassName = CLASS_NAME;
     RegisterClass(&wc);
 
+    // í—¤ë” ìœˆë„ìš° í´ë˜ìŠ¤
+    WNDCLASS wcHeader = { };
+    wcHeader.lpfnWndProc = HeaderWindowProc;
+    wcHeader.hInstance = hInst;
+    wcHeader.lpszClassName = HEADER_CLASS_NAME;
+    RegisterClass(&wcHeader);
+
     HWND hwnd = CreateWindowEx(
         0,
         CLASS_NAME,
-        L"Áö´Ï¾î½º ´ë·®Æò°¡",
+        L"ì§€ë‹ˆì–´ìŠ¤ ëŒ€ëŸ‰í‰ê°€",
         WS_POPUP,
         0, 0,
         GetSystemMetrics(SM_CXSCREEN),
@@ -99,13 +80,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
     SetForegroundWindow(hwnd);
     SetFocus(hwnd);
 
-    bool isTest = true;    // Å×½ºÆ® ½Ã true
-
-    if (!IsDualMonitorConnected(true) || isTest)
+    if (!IsDualMonitorConnected(true) || g_isPass)
     {
-         // exit button
-        g_exitButton = CreateExitButton(hwnd, hInst);
-
         // key hook
         SetKeyboardHook();
 
@@ -114,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
         CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MonitorForegroundWindow, NULL, 0, NULL);
 
         // open webview
-        LaunchWebView(hwnd);
+        LaunchWebView(hwnd, hInst);
     } else {
         DestroyWindow(hwnd);
     }

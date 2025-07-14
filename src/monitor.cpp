@@ -4,15 +4,16 @@
 #include <stdio.h>
 #include <tchar.h>
 
-extern bool g_isExit;
+extern bool g_noAlert
+;
 
-// ±âÁ¸ °æ°íÃ¢ È®ÀÎ
+// ê¸°ì¡´ ê²½ê³ ì°½ í™•ì¸
 void closeOldMsgBox(LPCWSTR msg)
 {
     
-    HWND oldMsgBox = FindWindow(NULL, L"°æ°í");
-    if (!oldMsgBox) {
-        MessageBox(NULL, msg, L"°æ°í", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+    HWND oldMsgBox = FindWindow(NULL, L"ê²½ê³ ");
+    if (!oldMsgBox && !g_noAlert) {
+        MessageBox(NULL, msg, L"ê²½ê³ ", MB_OK | MB_ICONWARNING | MB_TOPMOST);
     }
 }
 
@@ -23,7 +24,7 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
     return TRUE;
 }
 
-// µà¾ó ¸ğ´ÏÅÍ È®ÀÎ
+// ë“€ì–¼ ëª¨ë‹ˆí„° í™•ì¸
 BOOL IsDualMonitorConnected(bool isFirst)
 {
     int monitorCount = 0;
@@ -32,30 +33,31 @@ BOOL IsDualMonitorConnected(bool isFirst)
 
     bool isDualMonitor = monitorCount >= 2;
 
-    if(isDualMonitor && !g_isExit) {
-        closeOldMsgBox(L"º¸Á¶ ¸ğ´ÏÅÍ ¿¬°áÀ» ÇØÁ¦ÇØÁÖ¼¼¿ä." + (!isFirst && L" º¸Á¶ ¸ğ´ÏÅÍ°¡ ¿¬°áµÇ¾î ÀÖ´Â °æ¿ì Æò°¡¿¡ ºÒÀÌÀÍÀÌ ÀÖÀ» ¼ö ÀÖ½À´Ï´Ù."));
+    if(isDualMonitor) {
+        closeOldMsgBox(L"ë³´ì¡° ëª¨ë‹ˆí„° ì—°ê²°ì„ í•´ì œí•´ì£¼ì„¸ìš”." + (!isFirst && L" ë³´ì¡° ëª¨ë‹ˆí„°ê°€ ì—°ê²°ë˜ì–´ ìˆëŠ” ê²½ìš° í‰ê°€ì— ë¶ˆì´ìµì´ ìˆì„ ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
     }
 
     return isDualMonitor;
 }
 
 extern HWND g_mainWindow;
+extern HWND g_headerWindow;
 
-// ´Ù¸¥ Ã¢ °¨Áö
+// ë‹¤ë¥¸ ì°½ ê°ì§€
 void MonitorForegroundWindow()
 {
     while (true)
     {
         HWND foreground = GetForegroundWindow();
-        if (foreground && foreground != g_mainWindow)
+        if (foreground && foreground != g_mainWindow && foreground != g_headerWindow)
         {
             
-            if(!g_isExit) closeOldMsgBox(L"´Ù¸¥ Ã¢ÀÌ °¨ÁöµÇ¾ú½À´Ï´Ù. ´Ù¸¥ È­¸éÀÌ ¹İº¹ÀûÀ¸·Î ½ÇÇàµÇ´Â °æ¿ì Æò°¡¿¡ ºÒÀÌÀÍÀÌ ÀÖÀ» ¼ö ÀÖ½À´Ï´Ù.");
+            closeOldMsgBox(L"ë‹¤ë¥¸ ì°½ì´ ê°ì§€ë˜ì—ˆìŠµë‹ˆë‹¤. ë‹¤ë¥¸ í™”ë©´ì´ ë°˜ë³µì ìœ¼ë¡œ ì‹¤í–‰ë˜ëŠ” ê²½ìš° í‰ê°€ì— ë¶ˆì´ìµì´ ìˆì„ ìˆ˜ ìˆìŠµë‹ˆë‹¤.");
 
-            // ÇÊ¿ä ½Ã Á¾·á
+            // í•„ìš” ì‹œ ì¢…ë£Œ
             // PostMessage(g_mainWindow, WM_CLOSE, 0, 0);
         }
 
-        Sleep(1000); // 1ÃÊ¸¶´Ù °Ë»ç
+        Sleep(1000); // 1ì´ˆë§ˆë‹¤ ê²€ì‚¬
     }
 }
