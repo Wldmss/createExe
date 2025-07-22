@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <tchar.h>
 
-extern bool g_noAlert
-;
-
 // 기존 경고창 확인
 void closeOldMsgBox(LPCWSTR msg)
 {
@@ -39,9 +36,6 @@ BOOL IsDualMonitorConnected(bool isFirst)
 
     return isDualMonitor;
 }
-
-extern HWND g_mainWindow;
-extern HWND g_headerWindow;
 
 // 다른 창 감지
 void MonitorForegroundWindow()

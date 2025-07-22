@@ -21,6 +21,12 @@
 
 # 프로젝트 실행
 
+## 실행파일 명 변경
+- launch.json > program
+- task.json > args > "/Fe:build\\ktGeniusExam_v250709.exe"
+- CMakeLists.txt > set(TARGET_NAME ktGeniusExam_v250709)
+
+
 ##  릴리즈 빌드
 cmake -B build/Release -G "Visual Studio 17 2022"
 cmake --build build/Release --config Release

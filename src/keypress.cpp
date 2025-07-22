@@ -5,7 +5,6 @@
 #include <stdio.h>
 
 HHOOK g_hHook = NULL;
-extern bool g_isPass;
 
 void ShowWarningMessage()
 {
@@ -16,7 +15,7 @@ void ShowWarningMessage()
         Sleep(100);
     }
 
-    if(!g_isPass)
+    if(!g_passKeyHook)
         MessageBoxW(NULL,
             L"평가 중 alt, ctrl 키와 같은 특수키를 사용하실 수 없습니다.\n반복적으로 사용하실 경우 평가에 불이익이 있을 수 있습니다.",
             L"경고",
@@ -25,48 +24,36 @@ void ShowWarningMessage()
 
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-    if (nCode == HC_ACTION)
+    if (nCode == HC_ACTION && !g_passKeyHook)
     {
         KBDLLHOOKSTRUCT* p = (KBDLLHOOKSTRUCT*)lParam;
         bool isKeyBlocked  = false;
 
         if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
         {
-            switch (p->vkCode)
-            {
-                case VK_CONTROL:      // Ctrl
-                case VK_RCONTROL:
-                case VK_LCONTROL:
-                case VK_MENU:         // Alt
-                case VK_RMENU:
-                case VK_LMENU:
-                case VK_F11:
-                case VK_F12:
-                case VK_LWIN:           // Windows
-                case VK_RWIN:
-                    isKeyBlocked = true;
-                    break;
-
-                default:
-                    break;
-            }
-
-            // Alt+Tab
-            if ((GetAsyncKeyState(VK_MENU) & 0x8000) && p->vkCode == VK_TAB)
+            if (p->vkCode == VK_TAB && (p->flags & LLKHF_ALTDOWN))  // Alt+Tab
             {
                 isKeyBlocked = true;
-            }
-
-            // Ctrl + Esc
-            if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && p->vkCode == VK_ESCAPE)
+            } else if (p->vkCode == VK_ESCAPE && (GetAsyncKeyState(VK_CONTROL) & 0x8000))   // Ctrl+Esc
+            {
+                isKeyBlocked = true;
+            } else if (p->vkCode == VK_LWIN || p->vkCode == VK_RWIN || p->vkCode == VK_MENU || p->vkCode == VK_LMENU || p->vkCode == VK_RMENU)    // Windows 키, Alt 키
+            {
+                isKeyBlocked = true;
+            } else if (p->vkCode == VK_CONTROL || p->vkCode == VK_LCONTROL || p->vkCode == VK_RCONTROL || p->vkCode == VK_F11 || p->vkCode == VK_F12)    // Ctrl 키, F11, F12
             {
                 isKeyBlocked = true;
             }
         }
 
-        if (isKeyBlocked && !g_isPass)
+        if (isKeyBlocked)
         {
             CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ShowWarningMessage, NULL, 0, NULL);
+
+            if(g_mainWindow) { 
+                PostMessage(g_mainWindow, WM_RESTORE_FOCUS, 0, 0);
+            }
+
             return 1; // 키 입력 무시
         }
     }

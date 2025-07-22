@@ -5,8 +5,9 @@
 #include "monitor.h"
 #include "keypress.h"
 
-bool g_noAlert = true;   // 다른 창 경고 표시 여부 (TEST 용)
-bool g_isPass = true;    // key hook, 듀얼 모니터 체크 pass (TEST 용)
+bool g_noAlert = false;     // 다른 창 경고 표시 여부 (TEST 용), 기본 false
+bool g_passKeyHook = false; // key hook (TEST 용), 기본 false
+bool g_passDual = true;     // 듀얼 모니터 체크 pass (TEST 용), 기본 false
 
 HWND g_mainWindow = nullptr;
 
@@ -36,6 +37,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_CLOSE:
         DestroyWindow(hwnd);
         return 0;
+        
+    case WM_RESTORE_FOCUS:
+        MessageBox(hwnd, L"focus!!.", L"경고", MB_OK | MB_ICONWARNING);
+        // 1. 창을 잠깐 최상위로 만들어 맨 앞으로 오게 함
+        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+        // 2. 다시 일반 창으로 되돌림 (계속 최상위로 있으면 불편하므로)
+        SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+        // 3. 마지막으로 포그라운드 윈도우로 설정
+        SetForegroundWindow(hwnd);
+        return 0;
     }
 
     return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -43,8 +54,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 // Main
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
+// int main()
 {
     SetConsoleOutputCP(949); // EUC-KR (CP949)
+
+    // TEST
+    // HINSTANCE hInst = GetModuleHandle(NULL);
+    // int nCmdShow = SW_SHOWDEFAULT;
 
     // 메인 윈도우 클래스
     WNDCLASS wc = { };
@@ -80,7 +96,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
     SetForegroundWindow(hwnd);
     SetFocus(hwnd);
 
-    if (!IsDualMonitorConnected(true) || g_isPass)
+    if (!IsDualMonitorConnected(true) || g_passDual)
     {
         // key hook
         SetKeyboardHook();

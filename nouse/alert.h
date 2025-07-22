@@ -3,9 +3,9 @@
 
 #include <windows.h>
 
-#define ID_EXIT_BUTTON 1  // Æò°¡ Á¾·á ¹öÆ° ID
+#define ID_EXIT_BUTTON 1  // í‰ê°€ ì¢…ë£Œ ë²„íŠ¼ ID
 
-extern HWND g_hwnd;  // UI ÇÚµé ¿ÜºÎ Á¢±Ù¿ë
+extern HWND g_hwnd;  // UI í•¸ë“¤ ì™¸ë¶€ ì ‘ê·¼ìš©
 
 void InitAndShowUI(HINSTANCE hInstance, int nCmdShow);
 

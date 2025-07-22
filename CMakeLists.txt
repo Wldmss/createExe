@@ -2,11 +2,17 @@ cmake_minimum_required(VERSION 3.10)
 project(ktGeniusExam)
 
 set(CMAKE_CXX_STANDARD 17)
-set(TARGET_NAME ktGeniusExam_v250709)
+set(TARGET_NAME ktGeniusExam_v250722)
 
 add_definitions(-DUNICODE -D_UNICODE)
 
 # 빌드 대상
+# add_executable(${TARGET_NAME}
+#     src/main.cpp
+#     src/view.cpp
+#     src/monitor.cpp
+#     src/keypress.cpp
+# )
 add_executable(${TARGET_NAME} WIN32
     src/main.cpp
     src/view.cpp
