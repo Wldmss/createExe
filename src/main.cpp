@@ -39,7 +39,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
         
     case WM_RESTORE_FOCUS:
-        MessageBox(hwnd, L"focus!!.", L"경고", MB_OK | MB_ICONWARNING);
         // 1. 창을 잠깐 최상위로 만들어 맨 앞으로 오게 함
         SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
         // 2. 다시 일반 창으로 되돌림 (계속 최상위로 있으면 불편하므로)

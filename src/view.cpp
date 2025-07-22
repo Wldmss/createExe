@@ -146,7 +146,7 @@ void InjectedJavascript() {
                 args->get_WebMessageAsJson(&message);
                 std::wstring msg = message.get();
                 if (msg == L"\"buttonClicked\"") {
-                    MessageBox(nullptr, L"웹 버튼이 클릭되었습니다!", L"알림", MB_OK);
+                    // MessageBox(nullptr, L"웹 버튼이 클릭되었습니다!", L"알림", MB_OK);
                 }
                 return S_OK;
             }).Get(), nullptr);
@@ -159,7 +159,7 @@ void InjectedJavascript() {
                 sender->get_Source(&uri);
                 std::wstring targetUrl = L"myCourseList.do";
                 if (uri && std::wstring(uri.get()).find(targetUrl) != std::wstring::npos) {
-                    MessageBox(nullptr, L"특정 URL에 접속했습니다!", L"알림", MB_OK);
+                    // MessageBox(nullptr, L"특정 URL에 접속했습니다!", L"알림", MB_OK);
                 }
                 return S_OK;
             }).Get(), nullptr);
