@@ -31,7 +31,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 
         if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
         {
-            if (p->vkCode == VK_TAB && (p->flags & LLKHF_ALTDOWN))  // Alt+Tab
+            if ((p->flags & LLKHF_ALTDOWN) && p->vkCode == VK_TAB)  // Alt+Tab
             {
                 isKeyBlocked = true;
             } else if (p->vkCode == VK_ESCAPE && (GetAsyncKeyState(VK_CONTROL) & 0x8000))   // Ctrl+Esc

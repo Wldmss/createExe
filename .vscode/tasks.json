@@ -9,7 +9,7 @@
         "src\\*.cpp",  // 소스 파일 경로 (필요 시 수정)
         "/I", "include",
         "/I", "lib",
-        "/Fe:build\\ktGeniusExam_v250722.exe",  // 출력 실행 파일 이름
+        "/Fe:build\\ktGeniusExam_v250723.exe",  // 출력 실행 파일 이름
         "/link",
         "WebView2LoaderStatic.lib",
         "user32.lib",
