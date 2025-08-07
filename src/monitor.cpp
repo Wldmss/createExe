@@ -10,7 +10,7 @@ void closeOldMsgBox(LPCWSTR msg)
     
     HWND oldMsgBox = FindWindow(NULL, L"경고");
     if (!oldMsgBox && !g_noAlert) {
-        MessageBox(NULL, msg, L"경고", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+        MessageBox(g_mainWindow, msg, L"경고", MB_OK | MB_ICONWARNING | MB_TOPMOST);
     }
 }
 
@@ -43,10 +43,14 @@ void MonitorForegroundWindow()
     while (true)
     {
         HWND foreground = GetForegroundWindow();
+        printf("Current foreground window: %p\n", foreground);
         if (foreground && foreground != g_mainWindow && foreground != g_headerWindow)
         {
-            
-            closeOldMsgBox(L"다른 창이 감지되었습니다. 다른 화면이 반복적으로 실행되는 경우 평가에 불이익이 있을 수 있습니다.");
+            wchar_t className[256];
+            GetClassNameW(foreground, className, 256);
+            if (wcscmp(className, L"#32770") != 0) {
+                closeOldMsgBox(L"다른 창이 감지되었습니다. 다른 화면이 반복적으로 실행되는 경우 평가에 불이익이 있을 수 있습니다.");
+            }
 
             // 필요 시 종료
             // PostMessage(g_mainWindow, WM_CLOSE, 0, 0);

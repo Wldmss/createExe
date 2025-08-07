@@ -15,11 +15,10 @@ void ShowWarningMessage()
         Sleep(100);
     }
 
-    if(!g_passKeyHook)
-        MessageBoxW(NULL,
-            L"평가 중 alt, ctrl 키와 같은 특수키를 사용하실 수 없습니다.\n반복적으로 사용하실 경우 평가에 불이익이 있을 수 있습니다.",
-            L"경고",
-            MB_OK | MB_ICONWARNING | MB_TOPMOST);
+    MessageBox(g_mainWindow,
+        L"평가 중 alt, ctrl 키와 같은 특수키를 사용하실 수 없습니다.\n반복적으로 사용하실 경우 평가에 불이익이 있을 수 있습니다.",
+        L"경고",
+        MB_OK | MB_ICONWARNING | MB_TOPMOST);
 }
 
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -31,16 +30,17 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 
         if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
         {
-            if ((p->flags & LLKHF_ALTDOWN) && p->vkCode == VK_TAB)  // Alt+Tab
-            {
-                isKeyBlocked = true;
-            } else if (p->vkCode == VK_ESCAPE && (GetAsyncKeyState(VK_CONTROL) & 0x8000))   // Ctrl+Esc
-            {
-                isKeyBlocked = true;
-            } else if (p->vkCode == VK_LWIN || p->vkCode == VK_RWIN || p->vkCode == VK_MENU || p->vkCode == VK_LMENU || p->vkCode == VK_RMENU)    // Windows 키, Alt 키
+            if (p->vkCode == VK_LWIN || p->vkCode == VK_RWIN || p->vkCode == VK_MENU || p->vkCode == VK_LMENU || p->vkCode == VK_RMENU)    // Windows 키, Alt 키
             {
                 isKeyBlocked = true;
             } else if (p->vkCode == VK_CONTROL || p->vkCode == VK_LCONTROL || p->vkCode == VK_RCONTROL || p->vkCode == VK_F11 || p->vkCode == VK_F12)    // Ctrl 키, F11, F12
+            {
+                isKeyBlocked = true;
+            // } else if ((p->flags & LLKHF_ALTDOWN) && p->vkCode == VK_TAB)  // Alt+Tab
+            } else if ((GetAsyncKeyState(VK_MENU) & 0x8000) && p->vkCode == VK_TAB)
+            {
+                isKeyBlocked = true;
+            } else if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && p->vkCode == VK_ESCAPE)   // Ctrl+Esc
             {
                 isKeyBlocked = true;
             }

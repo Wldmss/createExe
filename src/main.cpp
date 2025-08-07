@@ -6,7 +6,7 @@
 #include "monitor.h"
 #include "keypress.h"
 
-bool g_noAlert = true;     // 다른 창 경고 표시 여부 (TEST 용), 기본 false
+bool g_noAlert = false;     // 다른 창 경고 표시 여부 (TEST 용), 기본 false
 bool g_passKeyHook = false; // key hook (TEST 용), 기본 false
 bool g_passDual = true;     // 듀얼 모니터 체크 pass (TEST 용), 기본 false
 
@@ -85,14 +85,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 // Main
-// int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
-int main()
+int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
+// int main()
 {
     SetConsoleOutputCP(949); // EUC-KR (CP949)
 
     // TEST (console 출력 - debug 용)
-    HINSTANCE hInst = GetModuleHandle(NULL);
-    int nCmdShow = SW_SHOWDEFAULT;
+    // HINSTANCE hInst = GetModuleHandle(NULL);
+    // int nCmdShow = SW_SHOWDEFAULT;
 
     // 메인 윈도우 클래스
     WNDCLASS wc = { };
