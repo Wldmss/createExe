@@ -303,11 +303,11 @@ void CreateHeader(HWND parent, HINSTANCE hInst) {
         rc.right - 110, 10, 100, 30,
         g_headerWindow, (HMENU)ID_EXIT_BUTTON, hInst, nullptr);
 
-    g_execPPTButton = CreateWindow(
-        L"BUTTON", L"파워포인트 실행", 
-        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-        rc.right - 310, 10, 150, 30,
-        g_headerWindow, (HMENU)ID_EXEC_PPT, hInst, nullptr);
+    // g_execPPTButton = CreateWindow(
+    //     L"BUTTON", L"파워포인트 실행", 
+    //     WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+    //     rc.right - 310, 10, 150, 30,
+    //     g_headerWindow, (HMENU)ID_EXEC_PPT, hInst, nullptr);
 }
 
 // 평가 종료 버튼

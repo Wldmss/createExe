@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(ktGeniusExam)
 
 set(CMAKE_CXX_STANDARD 17)
-set(TARGET_NAME ktGeniusExam_v250724)
+set(TARGET_NAME ktGeniusExam_v250807)
 
 add_definitions(-DUNICODE -D_UNICODE)
 

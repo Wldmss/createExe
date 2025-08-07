@@ -8,7 +8,7 @@
 
 bool g_noAlert = false;     // 다른 창 경고 표시 여부 (TEST 용), 기본 false
 bool g_passKeyHook = false; // key hook (TEST 용), 기본 false
-bool g_passDual = true;     // 듀얼 모니터 체크 pass (TEST 용), 기본 false
+bool g_passDual = false;     // 듀얼 모니터 체크 pass (TEST 용), 기본 false
 
 HWND g_mainWindow = nullptr;
 
