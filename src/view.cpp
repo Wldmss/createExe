@@ -32,7 +32,7 @@ static wil::com_ptr<ICoreWebView2Controller> g_webviewController;
 static wil::com_ptr<ICoreWebView2> g_webviewWindow;
 
 static HWND g_parentWindow = nullptr;
-const wchar_t WEB_URL[] = L"https://exam.ktedu.kt.com";
+const wchar_t WEB_URL[] = L"https://exam.ktedu.kt.com/login?type=exe";
 
 HWND g_headerWindow = nullptr;
 HWND g_exitButton = nullptr;
