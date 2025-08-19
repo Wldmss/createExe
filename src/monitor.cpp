@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
+#include <string>
 
 // 기존 경고창 확인
 void closeOldMsgBox(LPCWSTR msg)
@@ -31,7 +32,13 @@ BOOL IsDualMonitorConnected(bool isFirst)
     bool isDualMonitor = monitorCount >= 2;
 
     if(isDualMonitor) {
-        closeOldMsgBox(L"보조 모니터 연결을 해제해주세요." + (!isFirst && L" 보조 모니터가 연결되어 있는 경우 평가에 불이익이 있을 수 있습니다."));
+        std::wstring message = L"보조 모니터 연결을 해제해주세요.";
+
+        if (!isFirst) {
+            message += L" 보조 모니터가 연결되어 있는 경우 평가에 불이익이 있을 수 있습니다.";
+        }
+
+        closeOldMsgBox(message.c_str());
     }
 
     return isDualMonitor;
