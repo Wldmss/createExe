@@ -55,3 +55,17 @@ cmake --build build/Debug --config Debug
     - 1초에 한번씩 다른 창 감지
 - webview로 화면 노출 (view.cpp)
 - webview에서 평가 종료 화면 표기 시 앱 종료 처리 (view.cpp > InjectedJavascript)
+
+# 서명
+
+회사명 : KT Corporation
+지니어스1234!
+
+## 서명
+cd signing
+같은 위치에 exe 넣기
+
+>signtool.exe sign /a /v /s MY /n "KT Corporation" /as /fd sha256 /tr http://timestamp.sectigo.com /td sha256 ktGeniusExam.exe
+
+## 서명 확인
+>signtool.exe verify /v /pa ktGeniusExam.exe
