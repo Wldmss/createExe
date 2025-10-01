@@ -2,27 +2,61 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build genius with MSVC",
+      "label": "Build ktGeniusExam (Release)",
       "type": "shell",
-      "command": "cl.exe",
+      "command": "cmake",
       "args": [
-        "src\\*.cpp",  // 소스 파일 경로 (필요 시 수정)
-        "/I", "include",
-        "/I", "lib",
-        "/Fe:build\\ktGeniusExam_v250923.exe",  // 출력 실행 파일 이름
-        "/link",
-        "WebView2LoaderStatic.lib",
-        "user32.lib",
-        "ole32.lib",
-        "oleaut32.lib",
-        "gdi32.lib",
-        "windowscodecs.lib",
-        "shell32.lib"
+        "--build",
+        "${workspaceFolder}/build",
+        "--config",
+        "Release"
       ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
+      "group": "build",
+      "problemMatcher": [],
+      "detail": "빌드: CMake Release 빌드"
+    },
+    {
+      "label": "Build ktGeniusExam (Debug)",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "${workspaceFolder}/build",
+        "--config",
+        "Debug"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "detail": "빌드: CMake Debug 빌드"
     }
   ]
 }
+
+// {
+//   "version": "2.0.0",
+//   "tasks": [
+//     {
+//       "label": "build genius with MSVC",
+//       "type": "shell",
+//       "command": "cl.exe",
+//       "args": [
+//         "src\\*.cpp",  // 소스 파일 경로 (필요 시 수정)
+//         "/I", "include",
+//         "/I", "lib",
+//         "/Fe:build\\ktGeniusExam-0.0.1-250923.exe",  // 출력 실행 파일 이름
+//         "/link",
+//         "WebView2LoaderStatic.lib",
+//         "user32.lib",
+//         "ole32.lib",
+//         "oleaut32.lib",
+//         "gdi32.lib",
+//         "windowscodecs.lib",
+//         "shell32.lib"
+//       ],
+//       "options": {
+//         "cwd": "${workspaceFolder}"
+//       },
+//       "problemMatcher": []
+//     }
+//   ]
+// }

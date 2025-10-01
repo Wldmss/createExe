@@ -28,12 +28,16 @@
 
 
 ##  릴리즈 빌드
+```
 cmake -B build/Release -G "Visual Studio 17 2022"
+    - 처음이라면 cmake -B build/Release -G "Visual Studio 17 2022" -A x64
 cmake --build build/Release --config Release
 
 -> 파일 생성 경로: \build\Release\build\Release\
+```
 
 ##  Debug 빌드
+```
 Ctrl+Shift+P > Cmake:Configuration [Visual Studio Build Tools 2022 Release - amd64]
 Ctrl+Shift+P > Cmake:Build
 
@@ -42,10 +46,14 @@ cmake -B build/Debug -G "Visual Studio 17 2022" -A x64
 cmake --build build/Debug --config Debug
 
 -> 파일 생성 경로: \build\Debug\build\Debug\
+```
 
 # 주의사항
+```
 파일이 utf-8 이어야 정상적으로 실행됨.
+
 가끔 신경을 안쓰면 utf-8 로 변경하다가 한글이 모두 깨질수도 있으니 주의 바람
+```
 
 # 기능
 - 특수 키 차단 (keypress.cpp)
@@ -56,16 +64,67 @@ cmake --build build/Debug --config Debug
 - webview로 화면 노출 (view.cpp)
 - webview에서 평가 종료 화면 표기 시 앱 종료 처리 (view.cpp > InjectedJavascript)
 
-# 서명
+---
 
+# 서명
+```
 회사명 : KT Corporation
 지니어스1234!
+```
 
 ## 서명
+```
 cd signing
 같은 위치에 exe 넣기
 
 >signtool.exe sign /a /v /s MY /n "KT Corporation" /as /fd sha256 /tr http://timestamp.sectigo.com /td sha256 ktGeniusExam.exe
+```
 
 ## 서명 확인
 >signtool.exe verify /v /pa ktGeniusExam.exe
+
+---
+
+# installer
+cmake --build build/Release --config Release --target package
+
+---
+
+# 배포 방법
+
+0. 버전 변경
+
+    CMakeLists.txt > set(EXE_VERSION 0.0.1-250923) 버전 변경
+
+    0.0.* : 릴리즈 전
+    1.0.0 ~ : 릴리즈 이후
+
+    *.*.*-250930 : 뒤에 만든 날짜
+
+1. 릴리즈 빌드
+    
+    vsCode 에서
+    1) cmake -B build/Release -G "Visual Studio 17 2022"
+        - 처음이라면 cmake -B build/Release -G "Visual Studio 17 2022" -A x64
+    2) cmake --build build/Release --config Release
+
+    -> 파일 생성 경로: \build\Release\build\Release\
+
+2. 앱 서명
+    1) ./signing 폴더 하위로 1의 exe 파일 이동
+    2) 해당 위치에서 cmd 실행 및 아래 명령어 실행 (exe 파일명은 변경될 수 있음)
+        > signtool.exe sign /a /v /s MY /n "KT Corporation" /as /fd sha256 /tr http://timestamp.sectigo.com /td sha256 "지니어스 대량평가.exe"
+    4) \build\Release\build\Release\ 하위로 서명된 exe 이동
+
+3. 패키지 만들기
+    1) vsCode 에서 아래 명령어 실행
+        > cmake --build build/Release --config Release --target package
+    2) \build\Release\_CPack_Packages\win64\NSIS 하위에 지니어스 대량평가-0.0.2-250923-win64.exe 확인
+
+4. 패키지 서명
+    2. 앱 서명과 동일 (지니어스 대량평가-0.0.2-250923-win64.exe)
+
+5. 서명된 지니어스 대량평가-0.0.2-250923-win64.exe 전달
+
+
+
